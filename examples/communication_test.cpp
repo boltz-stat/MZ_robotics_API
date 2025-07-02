@@ -1,14 +1,14 @@
-// Copyright (c) 2023 Franka Robotics GmbH
+// Copyright (c) 2023 MZrobotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <chrono>
 #include <iostream>
 #include <thread>
 
-#include <franka/active_control.h>
-#include <franka/active_torque_control.h>
-#include <franka/duration.h>
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <mzrobotics/active_control.h>
+#include <mzrobotics/active_torque_control.h>
+#include <mzrobotics/duration.h>
+#include <mzrobotics/exception.h>
+#include <mzrobotics/robot.h>
 
 #include "examples_common.h"
 
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
   std::cout << std::fixed;
 
   try {
-    franka::Robot robot(argv[1]);
+    mzrobotics::Robot robot(argv[1]);
     setDefaultBehavior(robot);
 
     // First move the robot to a suitable joint configuration
@@ -48,84 +48,4 @@ int main(int argc, char** argv) {
     std::cout << "Finished moving to initial joint configuration." << std::endl << std::endl;
     std::cout << "Starting communication test." << std::endl;
 
-    robot.setCollisionBehavior(
-        {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}}, {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
-        {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}}, {{20.0, 20.0, 18.0, 18.0, 16.0, 14.0, 12.0}},
-        {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}},
-        {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}}, {{20.0, 20.0, 20.0, 25.0, 25.0, 25.0}});
-
-    franka::Torques zero_torques{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
-    auto rw_interface = robot.startTorqueControl();
-
-    franka::RobotState robot_state;
-    franka::Duration period;
-
-    while (!zero_torques.motion_finished) {
-      std::tie(robot_state, period) = rw_interface->readOnce();
-
-      time += period.toMSec();
-      if (time == 0.0) {
-        rw_interface->writeOnce(zero_torques);
-        continue;
-      }
-      counter++;
-
-      if (counter % 100 == 0) {
-        std::cout << "#" << counter
-                  << " Current success rate: " << robot_state.control_command_success_rate
-                  << std::endl;
-      }
-      std::this_thread::sleep_for(std::chrono::microseconds(100));
-
-      avg_success_rate += robot_state.control_command_success_rate;
-      if (robot_state.control_command_success_rate > max_success_rate) {
-        max_success_rate = robot_state.control_command_success_rate;
-      }
-      if (robot_state.control_command_success_rate < min_success_rate) {
-        min_success_rate = robot_state.control_command_success_rate;
-      }
-
-      if (time >= 10000) {
-        std::cout << std::endl << "Finished test, shutting down example" << std::endl;
-        zero_torques.motion_finished = true;
-      }
-      // Sending zero torques - if EE is configured correctly, robot should not move
-      rw_interface->writeOnce(zero_torques);
-    }
-  } catch (const franka::Exception& e) {
-    std::cout << e.what() << std::endl;
-    return -1;
-  }
-
-  avg_success_rate = avg_success_rate / counter;
-
-  std::cout << std::endl
-            << std::endl
-            << "#######################################################" << std::endl;
-  uint64_t lost_robot_states = time - counter;
-  if (lost_robot_states > 0) {
-    std::cout << "The control loop did not get executed " << lost_robot_states << " times in the"
-              << std::endl
-              << "last " << time << " milliseconds! (lost " << lost_robot_states << " robot states)"
-              << std::endl
-              << std::endl;
-  }
-
-  std::cout << "Control command success rate of " << counter << " samples: " << std::endl;
-  std::cout << "Max: " << max_success_rate << std::endl;
-  std::cout << "Avg: " << avg_success_rate << std::endl;
-  std::cout << "Min: " << min_success_rate << std::endl;
-
-  if (avg_success_rate < 0.90) {
-    std::cout << std::endl
-              << "WARNING: THIS SETUP IS PROBABLY NOT SUFFICIENT FOR FCI!" << std::endl;
-    std::cout << "PLEASE TRY OUT A DIFFERENT PC / NIC" << std::endl;
-  } else if (avg_success_rate < 0.95) {
-    std::cout << std::endl << "WARNING: MANY PACKETS GOT LOST!" << std::endl;
-    std::cout << "PLEASE INSPECT YOUR SETUP AND FOLLOW ADVICE ON" << std::endl
-              << "https://frankaemika.github.io/docs/troubleshooting.html" << std::endl;
-  }
-  std::cout << "#######################################################" << std::endl << std::endl;
-
-  return 0;
-}
+    robot.set

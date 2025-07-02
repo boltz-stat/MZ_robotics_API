@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Franka Robotics GmbH
+// Copyright (c) 2023 MZrobotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <array>
 #include <cmath>
@@ -7,10 +7,10 @@
 
 #include <Eigen/Dense>
 
-#include <franka/duration.h>
-#include <franka/exception.h>
-#include <franka/model.h>
-#include <franka/robot.h>
+#include <mzrobotics/duration.h>
+#include <mzrobotics/exception.h>
+#include <mzrobotics/model.h>
+#include <mzrobotics/robot.h>
 
 #include "examples_common.h"
 
@@ -45,12 +45,12 @@ int main(int argc, char** argv) {
 
   try {
     // connect to robot
-    franka::Robot robot(argv[1]);
+    mzrobotics::Robot robot(argv[1]);
     setDefaultBehavior(robot);
     // load the kinematics and dynamics model
-    franka::Model model = robot.loadModel();
+    mzrobotics::Model model = robot.loadModel();
 
-    franka::RobotState initial_state = robot.readOnce();
+    mzrobotics::RobotState initial_state = robot.readOnce();
 
     // equilibrium point is the initial position
     Eigen::Affine3d initial_transform(Eigen::Matrix4d::Map(initial_state.O_T_EE.data()));
@@ -64,13 +64,13 @@ int main(int argc, char** argv) {
                                {{100.0, 100.0, 100.0, 100.0, 100.0, 100.0}});
 
     // define callback for the torque control loop
-    std::function<franka::Torques(const franka::RobotState&, franka::Duration)>
-        impedance_control_callback = [&](const franka::RobotState& robot_state,
-                                         franka::Duration /*duration*/) -> franka::Torques {
+    std::function<mzrobotics::Torques(const mzrobotics::RobotState&, mzrobotics::Duration)>
+        impedance_control_callback = [&](const mzrobotics::RobotState& robot_state,
+                                         mzrobotics::Duration /*duration*/) -> mzrobotics::Torques {
       // get state variables
       std::array<double, 7> coriolis_array = model.coriolis(robot_state);
       std::array<double, 42> jacobian_array =
-          model.zeroJacobian(franka::Frame::kEndEffector, robot_state);
+          model.zeroJacobian(mzrobotics::Frame::kEndEffector, robot_state);
 
       // convert to Eigen
       Eigen::Map<const Eigen::Matrix<double, 7, 1>> coriolis(coriolis_array.data());
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
     std::cin.ignore();
     robot.control(impedance_control_callback);
 
-  } catch (const franka::Exception& ex) {
+  } catch (const mzrobotics::Exception& ex) {
     // print exception
     std::cout << ex.what() << std::endl;
   }

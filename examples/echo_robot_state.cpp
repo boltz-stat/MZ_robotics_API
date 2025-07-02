@@ -1,9 +1,9 @@
-// Copyright (c) 2023 Franka Robotics GmbH
+// Copyright (c) 2023 MZrobotics GmbH
 // Use of this source code is governed by the Apache-2.0 license, see LICENSE
 #include <iostream>
 
-#include <franka/exception.h>
-#include <franka/robot.h>
+#include <mzrobotics/exception.h>
+#include <mzrobotics/robot.h>
 
 /**
  * @example echo_robot_state.cpp
@@ -17,10 +17,10 @@ int main(int argc, char** argv) {
   }
 
   try {
-    franka::Robot robot(argv[1]);
+    mzrobotics::Robot robot(argv[1]);
 
     size_t count = 0;
-    robot.read([&count](const franka::RobotState& robot_state) {
+    robot.read([&count](const mzrobotics::RobotState& robot_state) {
       // Printing to std::cout adds a delay. This is acceptable for a read loop such as this, but
       // should not be done in a control loop.
       std::cout << robot_state << std::endl;
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     });
 
     std::cout << "Done." << std::endl;
-  } catch (franka::Exception const& e) {
+  } catch (mzrobotics::Exception const& e) {
     std::cout << e.what() << std::endl;
     return -1;
   }

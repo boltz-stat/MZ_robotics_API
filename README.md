@@ -1,35 +1,33 @@
-# libfranka: C++ Library for Franka Robotics Research Robots
+# MZrobotics # libmzrobotics：MZrobotics 机器人科研版 C++ 控制库
 
-[![codecov][codecov-status]][codecov]
+**libmzrobotics** 是一个 C++ 库，为 MZrobotics 机器人科研版提供底层控制接口。[自动生成的 API 文档][api-docs] 展示了其主要功能，[MZrobotics 控制接口（FCI）文档][fci-docs] 提供了机器人配置及功能使用的详细说明。
 
-**libfranka** is a C++ library that provides low-level control of Franka Robotics research robots. The [generated API documentation][api-docs] offers an overview of its capabilities, while the [Franka Control Interface (FCI) documentation][fci-docs] provides more information on setting up the robot and utilizing its features and functionalities.
+如需选择合适的版本，请参考 [兼容性矩阵][compatibility-matrix]。
 
-To find the appropriate version to use, please refer to the [Compatibility Matrix][compatibility-matrix].
+## 主要特性
 
-## Key Features
+- **底层控制**：为科研机器人提供高精度运动控制。
+- **实时通信**：实现与机器人实时交互。
 
-- **Low-level control**: Access precise motion control for research robots.
-- **Real-time communication**: Interact with the robot in real-time.
+## 快速开始
 
-## Getting Started
+### 1. 系统要求
 
-### 1. System Requirements
+在使用 **libmzrobotics** 前，请确保您的系统满足以下要求：
 
-Before using **libfranka**, ensure your system meets the following requirements:
+- **操作系统**：带 PREEMPT_RT 补丁的 Linux（推荐 Ubuntu 22.04，最低 Ubuntu 16.04）
+- **编译器**：GCC 7 或更高版本
+- **CMake**：3.10 或更高版本
+- **机器人**：已安装 FCI 功能的 MZrobotics 机器人
 
-- **Operating System**: [Linux with PREEMPT_RT patched kernel][real-time-kernel]  (Ubuntu 16.04 or later, Ubuntu 22.04 recommended)
-- **Compiler**: GCC 7 or later
-- **CMake**: Version 3.10 or later
-- **Robot**: Franka Robotics robot with FCI feature installed
-
-### 2. Installing dependencies
+### 2. 安装依赖
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y build-essential cmake git libpoco-dev libeigen3-dev libfmt-dev
 ```
 
-To use libfranka version `0.14.0` or later, you will need to install [pinocchio][stack-of-tasks] and some more dependencies:
+如需使用 libmzrobotics `0.14.0` 及以上版本，还需安装 [pinocchio][stack-of-tasks] 及其他依赖：
 
 ```bash
 sudo apt-get install -y lsb-release curl
@@ -46,92 +44,81 @@ sudo apt-get update
 sudo apt-get install -y robotpkg-pinocchio
 ```
 
-### 3. Building and Installation from Source
+### 3. 源码编译与安装
 
-Before building and installing from source, please uninstall existing installations of libfranka to avoid conflicts:
+在从源码编译和安装前，请先卸载已存在的 libmzrobotics 版本以避免冲突：
 
 ```bash
-sudo apt-get remove "*libfranka*"
+sudo apt-get remove "*libmzrobotics*"
 ```
 
-#### Clone the Repository
+#### 克隆仓库
 
-You can clone the repository and choose the version you need by selecting a specific tag:
+克隆仓库并根据需要选择特定版本：
 
 ```bash
 git clone --recurse-submodules https://github.com/frankaemika/libfranka.git
 cd libfranka
 ```
 
-List available tags
+列出可用版本标签
 
 ```bash
 git tag -l
 ```
 
-Checkout a specific tag (e.g., 0.15.0)
+检出指定版本（如 0.15.0）
 
 ```bash
 git checkout 0.15.0
 ```
 
-Update submodules
+更新子模块
 
 ```bash
 git submodule update
 ```
 
-Create a build directory and navigate to it
+创建并进入构建目录
 
 ```bash
 mkdir build
 cd build
 ```
 
-Configure the project and build
+配置并编译项目
 
 ```bash
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/opt/openrobots/lib/cmake -DBUILD_TESTS=OFF ..
 make
 ```
 
-#### Installing libfranka as a Debian Package (Optional but recommended)
+#### 以 Debian 包方式安装（可选，推荐）
 
-Building a Debian package is optional but recommended for easier installation and management. In the build folder, execute:
+建议以 Debian 包方式安装，便于管理。在 build 目录下执行：
 
 ```bash
 cpack -G DEB
 ```
 
-This command creates a Debian package named libfranka-<version>-<architecture>.deb. You can then install it with:
+该命令会生成名为 libmzrobotics--.deb 的 Debian 包。然后可通过以下命令安装：
 
 ```bash
-sudo dpkg -i libfranka*.deb
+sudo dpkg -i libmzrobotics*.deb
 ```
 
-Installing via a Debian package simplifies the process compared to building from source every time. Additionally the package integrates better with system tools and package managers, which can help manage updates and dependencies more effectively.
+通过 Debian 包安装可简化后续升级与依赖管理，并与系统工具集成更好。
 
-### 4. Usage
+### 4. 使用方法
 
-After installation, check the [Minimum System and Network Requirements][requirements] for network settings, the [Operating System and PC Configuration][real-time-kernel] for system setup, and the [Getting Started Manual][getting-started] for initial steps. Once configured, you can control the robot using the example applications provided in the examples folder.
+安装完成后，请查看 [最低系统与网络要求][requirements]、[操作系统与 PC 配置][real-time-kernel] 以及 [快速上手手册][getting-started]。配置完成后，可通过 examples 文件夹中的示例程序控制机器人。
 
-To run a sample program, navigate to the build folder and execute the following command:
+运行示例程序：
 
 ```bash
-./examples/communication_test <robot-ip> 
+./examples/communication_test 
 ```
 
-## License
+## 许可证
 
-`libfranka` is licensed under the [Apache 2.0 license][apache-2.0].
-
-[stack-of-tasks]: https://stack-of-tasks.github.io/pinocchio/download.html
-[real-time-kernel]: https://frankaemika.github.io/docs/installation_linux.html#setting-up-the-real-time-kernel
-[requirements]: https://frankaemika.github.io/docs/requirements.html
-[getting-started]: https://frankaemika.github.io/docs/getting_started.html#
-[compatibility-matrix]: https://frankaemika.github.io/docs/compatibility.html
-[apache-2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
-[api-docs]: https://frankaemika.github.io/libfranka/0.15.0
-[fci-docs]: https://frankaemika.github.io/docs
-[codecov-status]: https://codecov.io/gh/frankaemika/libfranka/branch/master/graph/badge.svg
-[codecov]: https://codecov.io/gh/frankaemika/libfranka
+`libmzrobotics` 采用 [Apache 2.0 许可证][apache-2.0] 发布。
